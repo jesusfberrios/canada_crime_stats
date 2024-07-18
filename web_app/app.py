@@ -3,15 +3,14 @@ import plotly.express as px
 import pandas as pd
 import json
 from urllib.request import urlopen
-from datetime import datetime
 import numpy as np
 from sqlalchemy import create_engine
-import pandas as pd
+import os
 
 # Define MySQL connection parameters
-db_user = 'db_userdfdsgfdg'
-db_pass = 'db_passfwefewfe'
-db_host = '192.168.250.129'
+db_user = os.environ['DB_USER']
+db_pass = os.environ['DB_PASSWORD']
+db_host = os.environ['DB_HOST']
 db_name = 'canada_stats'
 
 # Load the geojson data for Canada provinces
@@ -39,7 +38,7 @@ fig = px.choropleth_mapbox(df, geojson=canada_geojson, locations='location', fea
                            color_continuous_scale="rdbu_r",
                            range_color=(df['homicides'].min(), df['homicides'].max()),  # Adjust range dynamically
                            mapbox_style="carto-positron",
-                           zoom=2.5, center={"lat": 59.6868, "lon": -110.2421},
+                           zoom=2.5, center={"lat": 61, "lon": -99},
                            opacity=0.5,
                            labels={'homicides': 'Homicides', 'location': 'Province'}
                           )
@@ -60,9 +59,9 @@ app.layout = html.Div([
                 {'label': '% Persons Charged ', 'value': 'pct_charged'}
             ],
         value = 'homicides', 
-        style={'text-align': 'center'}),
+        style={'text-align': 'center', 'display': 'block', 'margin': 'auto'}),
 
-    dcc.Graph(id="choropleth-map", figure=fig, style={'width': '50%', 'margin': 'auto'}),
+    dcc.Graph(id="choropleth-map", figure=fig, style={'width': '60%', 'margin': 'auto'}),
 
     html.Div([
         dcc.RangeSlider(
@@ -76,7 +75,7 @@ app.layout = html.Div([
     ], style={'width': '35%', 'margin': 'auto'})
 
 
-])
+], style={'text-align': 'center'})
 
 # Define callback to update the figure based on year range selection
 @app.callback(
@@ -94,9 +93,10 @@ def update_figure(year_range, category):
         ON H.year = PC.year AND H.sgc_code = PC.sgc_code
         LEFT JOIN (SELECT province as location, sgc_code FROM provinces) P
         ON H.sgc_code = P.sgc_code
+        WHERE H.year BETWEEN {year_range[0]} AND {year_range[1]}
         '''
-        df = pd.read_sql(sql_update, con=engine)
-        filtered_df = df[(df['year'] >= year_range[0]) & (df['year'] <= year_range[1])]
+        filtered_df = pd.read_sql(sql_update, con=engine)
+        # filtered_df = df[(df['year'] >= year_range[0]) & (df['year'] <= year_range[1])]
 
         avg_data = filtered_df.groupby('location')[['persons_charged','homicides']].sum().reset_index()
         avg_data[category] = (100*avg_data['persons_charged']/avg_data['homicides']).round(2)
@@ -109,9 +109,10 @@ def update_figure(year_range, category):
         FROM {category} A
         LEFT JOIN (SELECT province as location, sgc_code FROM provinces) B
         ON A.sgc_code = B.sgc_code
+        WHERE A.year BETWEEN {year_range[0]} AND {year_range[1]}
         '''
-        df = pd.read_sql(sql_update, con=engine)
-        filtered_df = df[(df['year'] >= year_range[0]) & (df['year'] <= year_range[1])]
+        filtered_df = pd.read_sql(sql_update, con=engine)
+        # filtered_df = df[(df['year'] >= year_range[0]) & (df['year'] <= year_range[1])]
 
         avg_data = filtered_df.groupby('location')[category].mean().reset_index()
         avg_data[category] = avg_data[category].round(2)
@@ -121,7 +122,7 @@ def update_figure(year_range, category):
                             color_continuous_scale=color_scale,
                             range_color=(avg_data[category].min(), avg_data[category].max()),
                             mapbox_style="carto-positron",
-                            zoom=2.3, center={"lat": 61, "lon": -95},
+                            zoom=2.3, center={"lat": 61, "lon": -99},
                             opacity=0.5,
                             labels={category: dict_cat[category], 'location': 'Province'}
                             )

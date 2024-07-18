@@ -28,5 +28,7 @@ df_pc.to_sql('persons_charged', con=engine, if_exists='replace', index=False)
 df_pc = pd.read_csv('../data/provinces.csv')
 df_pc.to_sql('provinces', con=engine, if_exists='replace', index=False)
 
+print('Data was ingested successfully!!')
+
 # Close the connection
 engine.dispose()
