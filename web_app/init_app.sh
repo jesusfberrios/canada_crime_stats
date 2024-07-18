@@ -7,22 +7,13 @@ curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip
 unzip awscliv2.zip
 sudo ./aws/install
 git clone https://github.com/jesusfberrios/canada_crime_stats.git
-pip3 install sqlalchemy mysql-connector-python pandas 
+#pip3 install sqlalchemy mysql-connector-python pandas 
+pip3 install -r  canada_crime_stats/web_app/requirements.txt
 
 # Get credentials from secrets
 export DB_USER=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_USER')
 export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_PASSWORD')
-
-# Initialize Database params, restart service
-sudo mysql <<EOF
-CREATE DATABASE canada_stats;
-CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
-GRANT ALL PRIVILEGES ON canada_stats.* TO '$DB_USER'@'%';
-FLUSH PRIVILEGES;
-EOF
-sudo cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.backup
-sudo sed -i 's/^bind-address.*$/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
-sudo systemctl restart mysql
+export DB_HOST=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_HOST')
 
 # Get data
 git clone https://github.com/jesusfberrios/canada_crime_stats.git
