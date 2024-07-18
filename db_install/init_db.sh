@@ -25,6 +25,5 @@ sudo systemctl restart mysql
 
 # Get data
 git clone https://github.com/jesusfberrios/canada_crime_stats.git
-
-# 
+cd canada_crime_stats/db_install/
 python3 init_database.py

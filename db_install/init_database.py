@@ -4,7 +4,7 @@ import os
 
 # Define MySQL connection parameters
 db_user = os.environ['DB_USER']
-db_pass = os.environ['DB_PASS']
+db_pass = os.environ['DB_PASSWORD']
 db_host = 'localhost'
 db_name = 'canada_stats'
 
