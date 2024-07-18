@@ -1,36 +1,34 @@
 #!/bin/bash
 
-# Variables
-PGUSER="postgres"
-NEW_USER="my_service_user"
-NEW_PASSWORD="mypassword"
-NEW_DB="canada_stats"
-CSV_FILE="/path/to/your/data.csv"
-TABLE_NAME="crime_stats"
-
-
-sudo apt install mysql-server
-sudo apt install python3-pip
+# Install apps and python dependencies
+sudo apt update -y
+sudo apt install mysql-server python3-pip unzip jq -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 pip3 install sqlalchemy mysql-connector-python pandas
 
-CREATE DATABASE canada_stats;
-CREATE USER 'db_user'@'%' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON canada_stats.* TO 'db_user'@'%';
-FLUSH PRIVILEGES;
-EXIT;
+# Get credentials from secrets
+export DB_USER=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_USER')
+export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_PASSWORD')
 
+# Initialize Database params, restart service
+sudo mysql <<EOF
+CREATE DATABASE canada_stats;
+CREATE USER '$DB_USER'@'%' IDENTIFIED BY '$DB_PASSWORD';
+GRANT ALL PRIVILEGES ON canada_stats.* TO '$DB_USER'@'%';
+FLUSH PRIVILEGES;
+EOF
 sudo cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.backup
 sudo sed -i 's/^bind-address.*$/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
 sudo systemctl restart mysql
 
-
+# Get data
 mkdir data 
 cd data
 wget https://raw.githubusercontent.com/jesusfberrios/canada_crime_stats/main/data/homicides.csv
 wget https://raw.githubusercontent.com/jesusfberrios/canada_crime_stats/main/data/persons_charged.csv
 wget https://raw.githubusercontent.com/jesusfberrios/canada_crime_stats/main/data/provinces.csv
 
-export DBUSER="db_userdfsadafd"
-export DBPASS="db_passcsdafcdsf"
-
+# 
 python3 init_database.py

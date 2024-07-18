@@ -3,8 +3,8 @@ import pandas as pd
 import os
 
 # Define MySQL connection parameters
-db_user = os.environ['DBUSER']
-db_pass = os.environ['DBPASS']
+db_user = os.environ['DB_USER']
+db_pass = os.environ['DB_PASS']
 db_host = 'localhost'
 db_name = 'canada_stats'
 
