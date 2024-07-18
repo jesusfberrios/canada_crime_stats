@@ -16,4 +16,4 @@ export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id /mysql/cred
 export DB_HOST=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_HOST')
 
 # Turn on app
-python3 canada_crime_stats/web_app/app.py
+nohup python3 canada_crime_stats/web_app/app.py >> app_logs.out &
