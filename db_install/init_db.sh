@@ -24,11 +24,7 @@ sudo sed -i 's/^bind-address.*$/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d
 sudo systemctl restart mysql
 
 # Get data
-mkdir data 
-cd data
-wget https://raw.githubusercontent.com/jesusfberrios/canada_crime_stats/main/data/homicides.csv
-wget https://raw.githubusercontent.com/jesusfberrios/canada_crime_stats/main/data/persons_charged.csv
-wget https://raw.githubusercontent.com/jesusfberrios/canada_crime_stats/main/data/provinces.csv
+git clone https://github.com/jesusfberrios/canada_crime_stats.git
 
 # 
 python3 init_database.py

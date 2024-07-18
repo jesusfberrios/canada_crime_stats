@@ -19,13 +19,13 @@ except Exception as e:
     print("Connection failed:", e)
 
 
-df_h = pd.read_csv('./homicides.csv')
+df_h = pd.read_csv('../data/homicides.csv')
 df_h.to_sql('homicides', con=engine, if_exists='replace', index=False)
 
-df_pc = pd.read_csv('./persons_charged.csv')
+df_pc = pd.read_csv('../data/persons_charged.csv')
 df_pc.to_sql('persons_charged', con=engine, if_exists='replace', index=False)
 
-df_pc = pd.read_csv('./provinces.csv')
+df_pc = pd.read_csv('../data/provinces.csv')
 df_pc.to_sql('provinces', con=engine, if_exists='replace', index=False)
 
 # Close the connection
