@@ -9,8 +9,9 @@ sudo ./aws/install
 pip3 install sqlalchemy mysql-connector-python pandas
 
 # Get credentials from secrets
-export DB_USER=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_USER')
-export DB_PASSWORD=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString | jq -r 'fromjson' | jq -r '.DB_PASSWORD')
+SECRET_VALS=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString)
+export DB_USER=$(echo $SECRET_VALS | jq -r 'fromjson' | jq -r '.DB_USER')
+export DB_PASSWORD=$(echo $SECRET_VALS | jq -r 'fromjson' | jq -r '.DB_PASSWORD')
 
 # Initialize Database params, restart service
 sudo mysql <<EOF
