@@ -6,8 +6,6 @@ sudo apt install mysql-server python3-pip unzip jq -y
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
-#pip3 install sqlalchemy mysql-connector-python pandas
-git clone https://github.com/jesusfberrios/canada_crime_stats.git
 pip3 install -r  canada_crime_stats/db_install/requirements_db.txt
 
 # Get credentials from secrets
