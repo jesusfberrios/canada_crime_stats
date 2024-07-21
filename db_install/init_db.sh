@@ -6,7 +6,9 @@ sudo apt install mysql-server python3-pip unzip jq -y
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
-pip3 install sqlalchemy mysql-connector-python pandas
+#pip3 install sqlalchemy mysql-connector-python pandas
+git clone https://github.com/jesusfberrios/canada_crime_stats.git
+pip3 install -r  canada_crime_stats/db_install/requirements_db.txt
 
 # Get credentials from secrets
 SECRET_VALS=$(aws secretsmanager get-secret-value --secret-id /mysql/credentials --query SecretString)
@@ -25,6 +27,5 @@ sudo sed -i 's/^bind-address.*$/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d
 sudo systemctl restart mysql
 
 # Get data
-git clone https://github.com/jesusfberrios/canada_crime_stats.git
 cd canada_crime_stats/db_install/
 python3 init_database.py
